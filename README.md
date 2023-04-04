@@ -1,24 +1,6 @@
-# vue-login-jest
+# 로그인 vue-jest
 
-## Project setup
-```
-npm install
-```
+## 로그인 form 테스트 케이스 작성
 
-### Compiles and hot-reloads for development
-```
-npm run serve
-```
-
-### Compiles and minifies for production
-```
-npm run build
-```
-
-### Lints and fixes files
-```
-npm run lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+1. 로그인 할때 id,pw중 둘중 하나가 없으면 alert를 띄운다. (0)
+2. 로그인 할때 id,pw 둘다 존재하면, login api를 호출한다.
