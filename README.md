@@ -80,3 +80,76 @@ describe('Login.vue testing', () => {
   });
 });
 ```
+
+## 3. 로그인 실패(로그인시 정보가 맞지 않는 경우)
+
+> 로그인시 api를 호출하였으나, 정보가 맞지 않는 경우, 화면이동없이 'ID또는PW를 확인해주세요'와 함께 alert를 띄어준다.
+
+```javascript
+import { shallowMount } from '@vue/test-utils';
+import LoginView from '../LoginView.vue';
+import { login } from '@/api/login';
+jest.mock('@/api/login');
+
+describe('Login.vue testing', () => {
+  let wrapper = null;
+  let alert = null;
+  beforeEach(() => {
+    wrapper = shallowMount(LoginView);
+    alert = jest.spyOn(window, 'alert').mockImplementation();
+  });
+
+  test('로그인시 정보가 맞지 않는 경우', async () => {
+    //로그인 실패
+    login.mockImplementation(() => {
+      return new Promise(resolve => {
+        resolve({
+          data: {
+            success: 'fail',
+          },
+        });
+      });
+    });
+
+    await wrapper.find('input#id').setValue('test@gmail.com');
+    await wrapper.find('input#password').setValue('1q2w3e4r@');
+
+    await wrapper.find('button[type=submit]').trigger('click');
+    expect(alert).toBeCalledWith('ID또는PW를 확인해주세요');
+    alert.mockClear();
+  });
+});
+```
+
+## 4. 로그인 실패(서버에서 에러가 발생한 경우)
+
+> 로그인시 api를 호출하였으나, 서버에서 에러가 발생한 경우, Promise에서 reject으로 처리 한다.
+
+```javascript
+import { shallowMount } from '@vue/test-utils';
+import LoginView from '../LoginView.vue';
+import { login } from '@/api/login';
+jest.mock('@/api/login');
+
+describe('Login.vue testing', () => {
+  //서버 에러 난 경우
+  test('로그인 api에서 서버에러가 발생 한 경우', async () => {
+    login.mockImplementation(() => {
+      return new Promise((_, reject) => {
+        reject({
+          response: {
+            status: 500,
+          },
+        });
+      });
+    });
+
+    await wrapper.find('input#id').setValue('test@gmail.com');
+    await wrapper.find('input#password').setValue('1q2w3e4r@');
+
+    await wrapper.find('button[type=submit]').trigger('click');
+    expect(alert).toBeCalledWith('서버에서 에러가 발생하였습니다.');
+    alert.mockClear();
+  });
+});
+```

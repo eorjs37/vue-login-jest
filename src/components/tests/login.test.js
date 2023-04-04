@@ -28,8 +28,10 @@ describe('Login.vue testing', () => {
     login.mockImplementation(() => {
       return new Promise(resolve => {
         resolve({
-          success: 'ok',
-          token: 'mocktoken',
+          data: {
+            success: 'ok',
+            token: 'mocktoken',
+          },
         });
       });
     });
@@ -39,6 +41,46 @@ describe('Login.vue testing', () => {
     await wrapper.find('button[type=submit]').trigger('click');
 
     expect(alert).toBeCalledWith('로그인 되었습니다.');
+    alert.mockClear();
+  });
+
+  test('로그인시 정보가 맞지 않는 경우', async () => {
+    //로그인 실패
+    login.mockImplementation(() => {
+      return new Promise(resolve => {
+        resolve({
+          data: {
+            success: 'fail',
+          },
+        });
+      });
+    });
+
+    await wrapper.find('input#id').setValue('test@gmail.com');
+    await wrapper.find('input#password').setValue('1q2w3e4r@');
+
+    await wrapper.find('button[type=submit]').trigger('click');
+    expect(alert).toBeCalledWith('ID또는PW를 확인해주세요');
+    alert.mockClear();
+  });
+
+  //서버 에러 난 경우
+  test('로그인 api에서 서버에러가 발생 한 경우', async () => {
+    login.mockImplementation(() => {
+      return new Promise((_, reject) => {
+        reject({
+          response: {
+            status: 500,
+          },
+        });
+      });
+    });
+
+    await wrapper.find('input#id').setValue('test@gmail.com');
+    await wrapper.find('input#password').setValue('1q2w3e4r@');
+
+    await wrapper.find('button[type=submit]').trigger('click');
+    expect(alert).toBeCalledWith('서버에서 에러가 발생하였습니다.');
     alert.mockClear();
   });
 });

@@ -30,10 +30,16 @@ export default {
       })
         .then(res => {
           //response작성
-          alert('로그인 되었습니다.');
+          const { success, token } = res.data;
+          if (success === 'ok') {
+            alert('로그인 되었습니다.');
+          } else {
+            alert('ID또는PW를 확인해주세요');
+          }
         })
         .catch(err => {
           //error 작성
+          alert('서버에서 에러가 발생하였습니다.');
         })
         .finally(() => {
           //성공여부 상관없이 작업해야하는곳
