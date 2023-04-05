@@ -12,9 +12,11 @@
 import { onMounted, reactive } from 'vue';
 import { login, todoList } from '@/api/login.js';
 import { useRouter } from 'vue-router';
+import { useStore } from 'vuex';
 export default {
   setup() {
     const router = useRouter();
+    const store = useStore();
 
     const form = reactive({
       id: '',
@@ -35,6 +37,7 @@ export default {
           const { success, token } = res.data;
           if (success === 'ok') {
             alert('로그인 되었습니다.');
+            store.commit('setAccessToken', token);
             router.push('/main');
           } else {
             alert('ID또는PW를 확인해주세요');

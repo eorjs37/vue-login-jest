@@ -2,7 +2,13 @@ import { shallowMount } from '@vue/test-utils';
 import LoginView from '../LoginView.vue';
 import { login } from '@/api/login';
 import { useRouter } from 'vue-router';
+import { useStore } from 'vuex';
 jest.mock('@/api/login');
+jest.mock('vuex', () => ({
+  useStore: jest.fn(() => ({
+    commit: () => {},
+  })),
+}));
 jest.mock('vue-router', () => ({
   useRouter: jest.fn(() => ({
     push: () => {},
@@ -12,11 +18,16 @@ describe('Login.vue testing', () => {
   let wrapper = null;
   let alert = null;
   let push = null;
+  let commit = null;
 
   beforeEach(() => {
     push = jest.fn();
+    commit = jest.fn();
     useRouter.mockImplementation(() => ({
       push,
+    }));
+    useStore.mockImplementation(() => ({
+      commit,
     }));
     wrapper = shallowMount(LoginView);
     alert = jest.spyOn(window, 'alert').mockImplementation();
@@ -53,6 +64,9 @@ describe('Login.vue testing', () => {
     await wrapper.find('form').trigger('submit.prevent');
 
     await expect(alert).toBeCalledWith('로그인 되었습니다.');
+    //store token 저장
+    expect(commit).toHaveBeenCalledWith('setAccessToken', 'mocktoken');
+
     // router.push를 호출하였는지 확인
     expect(push).toHaveBeenCalled();
 
