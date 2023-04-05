@@ -3,20 +3,9 @@
 </template>
 
 <script>
-import { useRouter } from 'vue-router';
 export default {
   name: 'App',
-  setup() {
-    const router = useRouter();
-
-    const pushRouter = () => {
-      router.push('/login');
-    };
-
-    return {
-      pushRouter,
-    };
-  },
+  setup() {},
 };
 </script>
 

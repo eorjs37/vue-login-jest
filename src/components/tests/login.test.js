@@ -27,8 +27,7 @@ describe('Login.vue testing', () => {
 
     await wrapper.find('input#password');
 
-    await wrapper.find('button[type=submit]').trigger('click');
-
+    await wrapper.find('form').trigger('submit.prevent');
     expect(alert).toBeCalled();
 
     alert.mockClear();
@@ -51,7 +50,7 @@ describe('Login.vue testing', () => {
     await wrapper.find('input#id').setValue('chleorjs37@gmail.com');
     await wrapper.find('input#password').setValue('chleorjs12@');
 
-    await wrapper.find('button[type=submit]').trigger('click');
+    await wrapper.find('form').trigger('submit.prevent');
 
     await expect(alert).toBeCalledWith('로그인 되었습니다.');
     // router.push를 호출하였는지 확인
@@ -77,7 +76,7 @@ describe('Login.vue testing', () => {
     await wrapper.find('input#id').setValue('test@gmail.com');
     await wrapper.find('input#password').setValue('1q2w3e4r@');
 
-    await wrapper.find('button[type=submit]').trigger('click');
+    await wrapper.find('form').trigger('submit.prevent');
     expect(alert).toBeCalledWith('ID또는PW를 확인해주세요');
     alert.mockClear();
   });
@@ -97,7 +96,7 @@ describe('Login.vue testing', () => {
     await wrapper.find('input#id').setValue('test@gmail.com');
     await wrapper.find('input#password').setValue('1q2w3e4r@');
 
-    await wrapper.find('button[type=submit]').trigger('click');
+    await wrapper.find('form').trigger('submit.prevent');
     expect(alert).toBeCalledWith('서버에서 에러가 발생하였습니다.');
     alert.mockClear();
   });
