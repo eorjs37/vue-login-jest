@@ -12,8 +12,13 @@ jest.mock('vue-router', () => ({
 describe('Login.vue testing', () => {
   let wrapper = null;
   let alert = null;
+  let push = null;
 
   beforeEach(() => {
+    push = jest.fn();
+    useRouter.mockImplementationOnce(() => ({
+      push,
+    }));
     wrapper = shallowMount(LoginView);
     alert = jest.spyOn(window, 'alert').mockImplementation();
   });
@@ -50,7 +55,8 @@ describe('Login.vue testing', () => {
     await wrapper.find('button[type=submit]').trigger('click');
 
     await expect(alert).toBeCalledWith('로그인 되었습니다.');
-
+    expect(push).toHaveBeenCalled();
+    expect(push).toHaveBeenCalledWith('/main');
     alert.mockClear();
   });
 

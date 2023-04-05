@@ -1,13 +1,23 @@
 <template>
   <nav><router-link to="/">Home</router-link> |</nav>
+  <button @click="pushRouter()">라우터 이동</button>
   <router-view />
 </template>
 
 <script>
+import { useRouter } from 'vue-router';
 export default {
   name: 'App',
   setup() {
-    console.log(process.env);
+    const router = useRouter();
+
+    const pushRouter = () => {
+      router.push('/login');
+    };
+
+    return {
+      pushRouter,
+    };
   },
 };
 </script>
