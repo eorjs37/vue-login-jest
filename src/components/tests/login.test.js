@@ -1,12 +1,18 @@
 import { shallowMount } from '@vue/test-utils';
 import LoginView from '../LoginView.vue';
 import { login } from '@/api/login';
-
+import { useRouter } from 'vue-router';
 jest.mock('@/api/login');
-
+jest.mock('vue-router', () => ({
+  useRoute: jest.fn(),
+  useRouter: jest.fn(() => ({
+    push: () => {},
+  })),
+}));
 describe('Login.vue testing', () => {
   let wrapper = null;
   let alert = null;
+
   beforeEach(() => {
     wrapper = shallowMount(LoginView);
     alert = jest.spyOn(window, 'alert').mockImplementation();
@@ -20,10 +26,11 @@ describe('Login.vue testing', () => {
     await wrapper.find('button[type=submit]').trigger('click');
 
     expect(alert).toBeCalled();
+
     alert.mockClear();
   });
 
-  test('form submit할때 id ,pw 둘다 있는경우 and 로그인 성공', async () => {
+  test('form submit할때 id ,pw 둘다 있는경우 and 로그인 성공 후 main으로 이동', async () => {
     //로그인 성공
     login.mockImplementation(() => {
       return new Promise(resolve => {
@@ -35,12 +42,15 @@ describe('Login.vue testing', () => {
         });
       });
     });
+
+    //가짜 router
     await wrapper.find('input#id').setValue('chleorjs37@gmail.com');
     await wrapper.find('input#password').setValue('chleorjs12@');
 
     await wrapper.find('button[type=submit]').trigger('click');
 
-    expect(alert).toBeCalledWith('로그인 되었습니다.');
+    await expect(alert).toBeCalledWith('로그인 되었습니다.');
+
     alert.mockClear();
   });
 

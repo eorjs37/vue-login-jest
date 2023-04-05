@@ -11,9 +11,11 @@
 <script>
 import { onMounted, reactive } from 'vue';
 import { login, todoList } from '@/api/login.js';
-import axios from 'axios';
+import { useRouter } from 'vue-router';
 export default {
   setup() {
+    const router = useRouter();
+
     const form = reactive({
       id: '',
       pw: '',
@@ -33,6 +35,7 @@ export default {
           const { success, token } = res.data;
           if (success === 'ok') {
             alert('로그인 되었습니다.');
+            router.push('/main');
           } else {
             alert('ID또는PW를 확인해주세요');
           }
