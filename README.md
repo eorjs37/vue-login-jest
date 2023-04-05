@@ -141,6 +141,27 @@ describe('Login.vue testing', () => {
 });
 ```
 
+### 2-2. 로그인 완료 후 store에 commit을 통해 token저장
+
+> 로그인 완료 후 useStore를 mocking한 후 commit 하기
+
+```javascript
+import { useStore } from 'vuex';
+//vue-router를 mock한 후 useRouter를 jest.fn으로 가짜 함수 만들기
+jest.mock('vue-router', () => ({
+  useRouter: jest.fn(() => ({
+    push: () => {},
+  })),
+}));
+
+test(('로그인 성공 완료 후 토큰은 vuex에 저장하기')=>{
+  //이미 로그인 로직이 성공적으로 됐다는 전제하에 작성하였습니다.
+  // store.commit('setAccessToken',리턴받은가짜토큰) 입니다.
+  // toHaveBeenCalledWith으로 호출할 경우 첫번째 인자에는 store의 mutations에서 어떤 함수를 호출하였는가이고 , 두번째 인자는 token값입니다.
+  expect(commit).toHaveBeenCalledWith('setAccessToken', 'mocktoken');
+})
+```
+
 ## 3. 로그인 실패(로그인시 정보가 맞지 않는 경우)
 
 > 로그인시 api를 호출하였으나, 정보가 맞지 않는 경우, 화면이동없이 'ID또는PW를 확인해주세요'와 함께 alert를 띄어준다.
@@ -210,6 +231,184 @@ describe('Login.vue testing', () => {
     await wrapper.find('button[type=submit]').trigger('click');
     expect(alert).toBeCalledWith('서버에서 에러가 발생하였습니다.');
     alert.mockClear();
+  });
+});
+```
+
+---
+
+## router 권한체크 테스트 케이스 작성
+
+store/index.js를 작성 해준다.
+
+```javascript
+//store/index.js
+import { createRouter, createWebHistory } from 'vue-router';
+import { checkToken } from '@/api/login';
+const routes = [
+  {
+    path: '/',
+    name: 'helloworld',
+    component: () => import('../components/HelloWorld.vue'),
+  },
+  {
+    path: '/main',
+    name: 'main',
+    component: () => import('../components/Main.vue'),
+    meta: { authRequired: true },
+  },
+  {
+    path: '/login',
+    name: 'login',
+    component: () => import('../components/LoginView.vue'),
+  },
+];
+
+export const bfEach = async (to, from, next) => {
+  try {
+    if (to.matched.some(routeInfo => routeInfo.meta.authRequired)) {
+      const { data } = await checkToken('test');
+      const { success } = data;
+      if (success === 'ok') {
+        next();
+      } else {
+        next('/login');
+      }
+    }
+    next();
+  } catch (error) {
+    // console.error('error  : ', error);
+    alert('인증이 만료되었습니다.');
+    next('/login');
+  }
+};
+
+const router = createRouter({
+  history: createWebHistory(process.env.BASE_URL),
+  routes,
+});
+
+router.beforeEach(bfEach);
+
+export default router;
+```
+
+---
+
+### 1.화면 진입 전에 token 체크 후 인증되었을 경우
+
+> 화면마다 권한이 필요한 경우가 있다.권한이 있는경우 권한을 확인한 후  
+> 진입할수 있도록 한다.
+
+```javascript
+//라우터 진입하기전에 만든 함수인 bfEach이다.
+import { bfEach } from '../index';
+//토큰을 조회 할 수 있는 checkToken 이다.
+import { checkToken } from '@/api/login';
+jest.mock('@/api/login');
+
+describe('router testing', () => {
+  let from = null;
+  let next = null;
+  let alert = null;
+  beforeEach(() => {
+    from = jest.fn();
+    next = jest.fn();
+    alert = jest.spyOn(window, 'alert').mockImplementation();
+  });
+
+  test('화면 진입 전에 token 체크 후 인증되었을 경우', async () => {
+    const to = {
+      matched: [{ meta: { authRequired: true } }],
+    };
+    checkToken.mockImplementation(() => {
+      return new Promise(resolve => {
+        resolve({
+          data: {
+            success: 'ok',
+            token: 'testtoken',
+          },
+        });
+      });
+    });
+    //bfEach는 to,from,next 새 개의 인자를 받는다.
+    //to 안에는 권한을 필수로 받을 경우 처리한다.
+    bfEach(to, from, next);
+    //checkToken를 호출했는지 확인한다.
+    await expect(checkToken).toHaveBeenCalled();
+    //checkToken를 통해 인증이 되었다면, next를 통해 다음 화면으로 이동한다.
+    expect(next).toHaveBeenCalled();
+  });
+});
+```
+
+### 2.화면진입 전에 token 체크 후 인증실패 할 경우 login 으로 이동
+
+> token을 조회하였을때 error가 날 경우 인증만료로 처리한다.
+
+```javascript
+//라우터 진입하기전에 만든 함수인 bfEach이다.
+import { bfEach } from '../index';
+//토큰을 조회 할 수 있는 checkToken 이다.
+import { checkToken } from '@/api/login';
+jest.mock('@/api/login');
+
+describe('router testing', () => {
+  let from = null;
+  let next = null;
+  let alert = null;
+  beforeEach(() => {
+    from = jest.fn();
+    next = jest.fn();
+    alert = jest.spyOn(window, 'alert').mockImplementation();
+  });
+
+  test('화면진입 전에 token 체크 후 인증실패 할 경우 login 으로 이동', async () => {
+    const to = {
+      matched: [{ meta: { authRequired: true } }],
+    };
+    //에러를 리턴한다.
+    checkToken.mockImplementation(() => {
+      return new Promise((_, reject) => {
+        reject({
+          err: {
+            name: 'JsonWebTokenError',
+            message: 'jwt malformed',
+          },
+          msg: '유효하지 않는 토큰',
+        });
+      });
+    });
+    bfEach(to, from, next);
+    //토큰 api를 호출하였는지 확인한다.
+    await expect(checkToken).toHaveBeenCalled();
+    //토큰 api를 호출하여 실패하였으니, login으로 이동한다.
+    expect(next).toHaveBeenCalledWith('/login');
+    expect(alert).toBeCalledWith('인증이 만료되었습니다.');
+    alert.mockClear();
+  });
+});
+```
+
+### 3.meta에 authRequired가 없을 경우 next만 호출
+
+> 권한체크가 필요없는 화면의 경우 바로 next으로 다음화면을 이동한다.
+
+```javascript
+import { bfEach } from '../index';
+import { checkToken } from '@/api/login';
+
+describe('router testing', () => {
+  let from = null;
+  let next = null;
+  beforeEach(() => {
+    from = jest.fn();
+    next = jest.fn();
+  });
+  test('meta에 authRequired가 없을 경우 next만 호출', () => {
+    const to = null;
+    bfEach(to, from, next);
+    expect(next).toHaveBeenCalled();
   });
 });
 ```
