@@ -2,8 +2,16 @@ import { instance } from '@/axios/axios';
 const login = data => {
   return instance.post('/api/ionic/user/login', data);
 };
-let todoList = () => {
+const todoList = () => {
   return instance.get(`/api/todo`);
 };
 
-export { login, todoList };
+const checkToken = token => {
+  return instance.get('/api/token', {
+    params: {
+      token,
+    },
+  });
+};
+
+export { login, todoList, checkToken };
