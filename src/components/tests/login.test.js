@@ -4,7 +4,6 @@ import { login } from '@/api/login';
 import { useRouter } from 'vue-router';
 jest.mock('@/api/login');
 jest.mock('vue-router', () => ({
-  useRoute: jest.fn(),
   useRouter: jest.fn(() => ({
     push: () => {},
   })),
@@ -16,7 +15,7 @@ describe('Login.vue testing', () => {
 
   beforeEach(() => {
     push = jest.fn();
-    useRouter.mockImplementationOnce(() => ({
+    useRouter.mockImplementation(() => ({
       push,
     }));
     wrapper = shallowMount(LoginView);
@@ -55,7 +54,10 @@ describe('Login.vue testing', () => {
     await wrapper.find('button[type=submit]').trigger('click');
 
     await expect(alert).toBeCalledWith('로그인 되었습니다.');
+    // router.push를 호출하였는지 확인
     expect(push).toHaveBeenCalled();
+
+    // router.push를 호출하였을때 '/main'을 호출하였는지 확인
     expect(push).toHaveBeenCalledWith('/main');
     alert.mockClear();
   });

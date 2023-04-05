@@ -81,6 +81,66 @@ describe('Login.vue testing', () => {
 });
 ```
 
+## 2-1. 로그인 완료 후 라우터 mocking으로 화면 이동하기
+
+> 로그인 완료 후 useRouter를 mocking한 후 push 하기
+
+```javascript
+import { shallowMount } from '@vue/test-utils';
+import LoginView from '../LoginView.vue';
+import { login } from '@/api/login';
+import { useRouter } from 'vue-router';
+jest.mock('@/api/login');
+//vue-router를 통째로 mock한 후 useRouter를 빈 함수로 생성
+jest.mock('vue-router', () => ({
+  useRouter: jest.fn(() => ({
+    push: () => {},
+  })),
+}));
+describe('Login.vue testing', () => {
+  let wrapper = null;
+  let alert = null;
+  let push = null;
+
+  beforeEach(() => {
+    push = jest.fn();
+    //한번만 호출 구현
+    useRouter.mockImplementation(() => ({
+      push,
+    }));
+    wrapper = shallowMount(LoginView);
+    alert = jest.spyOn(window, 'alert').mockImplementation();
+  });
+
+  test('form submit할때 id ,pw 둘다 있는경우 and 로그인 성공 후 main으로 이동', async () => {
+    //로그인 성공
+    login.mockImplementation(() => {
+      return new Promise(resolve => {
+        resolve({
+          data: {
+            success: 'ok',
+            token: 'mocktoken',
+          },
+        });
+      });
+    });
+
+    await wrapper.find('input#id').setValue('chleorjs37@gmail.com');
+    await wrapper.find('input#password').setValue('chleorjs12@');
+
+    await wrapper.find('button[type=submit]').trigger('click');
+
+    await expect(alert).toBeCalledWith('로그인 되었습니다.');
+    //가짜 router으로 이동 확인
+    // router.push를 호출하였는지 확인
+    expect(push).toHaveBeenCalled();
+    // router.push를 호출하였을때 '/main'을 호출하였는지 확인
+    expect(push).toHaveBeenCalledWith('/main');
+    alert.mockClear();
+  });
+});
+```
+
 ## 3. 로그인 실패(로그인시 정보가 맞지 않는 경우)
 
 > 로그인시 api를 호출하였으나, 정보가 맞지 않는 경우, 화면이동없이 'ID또는PW를 확인해주세요'와 함께 alert를 띄어준다.
