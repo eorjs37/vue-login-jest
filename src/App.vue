@@ -1,6 +1,4 @@
 <template>
-  <nav><router-link to="/">Home</router-link> |</nav>
-  <button @click="pushRouter()">라우터 이동</button>
   <router-view />
 </template>
 

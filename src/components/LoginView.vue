@@ -4,7 +4,7 @@
       <legend>로그인</legend>
       ID : <input type="text" id="id" v-model="form.id" /> PW : <input type="password" id="password" v-model="form.pw" />
 
-      <button type="submit" @click="submit">로그인</button>
+      <button type="submit">로그인</button>
     </fieldset>
   </form>
 </template>
@@ -49,12 +49,9 @@ export default {
         });
     };
 
-    const loginApi = () => {};
-
     return {
       form,
       submit,
-      loginApi,
     };
   },
 };
