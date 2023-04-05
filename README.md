@@ -81,7 +81,7 @@ describe('Login.vue testing', () => {
 });
 ```
 
-## 2-1. 로그인 완료 후 라우터 mocking으로 화면 이동하기
+### 2-1. 로그인 완료 후 라우터 mocking으로 화면 이동하기
 
 > 로그인 완료 후 useRouter를 mocking한 후 push 하기
 
