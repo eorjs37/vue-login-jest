@@ -9,8 +9,8 @@
   </form>
 </template>
 <script>
-import { onMounted, reactive } from 'vue';
-import { login, todoList } from '@/api/login.js';
+import { reactive } from 'vue';
+import { login } from '@/api/login.js';
 import { useRouter } from 'vue-router';
 import { useStore } from 'vuex';
 export default {

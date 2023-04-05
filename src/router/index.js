@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import { checkToken } from '@/api/login';
+import { store } from '@/store';
 const routes = [
   {
     path: '/',
@@ -22,9 +23,9 @@ const routes = [
 export const bfEach = async (to, from, next) => {
   try {
     if (to.matched.some(routeInfo => routeInfo.meta.authRequired)) {
-      const { data } = await checkToken('test');
-      const { success } = data;
-      if (success === 'ok') {
+      const { data } = await checkToken(store.getters.getToken);
+      const { msg } = data;
+      if (msg === 'success') {
         next();
       } else {
         next('/login');

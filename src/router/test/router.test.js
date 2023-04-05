@@ -20,8 +20,11 @@ describe('router testing', () => {
       return new Promise(resolve => {
         resolve({
           data: {
-            success: 'ok',
-            token: 'testtoken',
+            msg: 'success',
+            UserId: 'chleorjs37@gmail.com',
+            iat: 1680681965,
+            exp: 1680768365,
+            iss: 'issuer',
           },
         });
       });

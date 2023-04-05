@@ -1,5 +1,5 @@
 import { createStore } from 'vuex';
-
+import createPersistedState from 'vuex-persistedstate';
 const store = createStore({
   state() {
     return {
@@ -17,6 +17,7 @@ const store = createStore({
     },
   },
   actions: {},
+  plugins: [createPersistedState()],
 });
 
 export { store };
