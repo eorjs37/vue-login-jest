@@ -14,4 +14,8 @@ const checkToken = token => {
   });
 };
 
-export { login, todoList, checkToken };
+const saveProfile = data => {
+  return instance.post('/api/user', data);
+};
+
+export { login, todoList, checkToken, saveProfile };

@@ -14,6 +14,11 @@ const routes = [
     meta: { authRequired: true },
   },
   {
+    path: '/join',
+    name: 'join',
+    component: () => import('../components/JoinView.vue'),
+  },
+  {
     path: '/login',
     name: 'login',
     component: () => import('../components/LoginView.vue'),
