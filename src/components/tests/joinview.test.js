@@ -2,13 +2,22 @@ import { shallowMount } from '@vue/test-utils';
 import JoinView from '../JoinView.vue';
 import { required, passwordValidate, emailValidate } from '@/utils/validate';
 import { saveProfile } from '@/api/login';
-
+import { useRouter } from 'vue-router';
 jest.mock('@/api/login');
 jest.spyOn(window, 'alert').mockImplementation(() => {});
-
+jest.mock('vue-router', () => ({
+  useRouter: jest.fn(() => ({
+    push: () => {},
+  })),
+}));
 describe('회원가입 testing', () => {
   let wrapper = null;
+  let push = null;
   beforeEach(() => {
+    push = jest.fn();
+    useRouter.mockImplementation(() => ({
+      push,
+    }));
     wrapper = shallowMount(JoinView);
   });
 
@@ -104,7 +113,13 @@ describe('회원가입 testing', () => {
   });
 
   test('form에서 모든 값이 있을 경우 회원가입을 실행한다.', async () => {
-    saveProfile.mockImplementation(() => {});
+    saveProfile.mockImplementation(() => {
+      return new Promise(resolove => {
+        resolove({
+          status: 201,
+        });
+      });
+    });
 
     await wrapper.find('#name').setValue('홍길동');
     await wrapper.find('#password').setValue('chleorjs12@');
@@ -114,5 +129,9 @@ describe('회원가입 testing', () => {
 
     await wrapper.find('form').trigger('submit.prevent');
     await expect(saveProfile).toHaveBeenCalled();
+    expect(alert).toBeCalledWith('회원가입되셨습니다.');
+    alert.mockClear();
+    // router.push를 호출하였는지 확인
+    expect(push).toHaveBeenCalledWith('/login');
   });
 });
