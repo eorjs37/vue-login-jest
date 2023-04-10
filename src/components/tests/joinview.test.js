@@ -34,7 +34,7 @@ describe('회원가입 testing', () => {
     alert.mockClear();
   });
 
-  test('input[id=password] 비밀번호는 필수값 체크과 ', async () => {
+  test('input[id=password] 비밀번호는 필수값 체크 ', async () => {
     const password = wrapper.find('#password');
     await password.setValue('');
     //유효성 검사
@@ -124,7 +124,7 @@ describe('회원가입 testing', () => {
     await wrapper.find('#name').setValue('홍길동');
     await wrapper.find('#password').setValue('chleorjs12@');
     await wrapper.find('#email').setValue('chleorjs37@gmail.com');
-    await wrapper.find('#tel').setValue('010-2908-3509');
+    await wrapper.find('#tel').setValue('01029083509');
     await wrapper.find('#gender[value=men]').setValue();
 
     await wrapper.find('form').trigger('submit.prevent');
@@ -135,7 +135,7 @@ describe('회원가입 testing', () => {
     expect(push).toHaveBeenCalledWith('/login');
   });
 
-  test('form에서 모든 값이 있을 경우 회원가입을 실행하고 response를 404으로 받았을 경우', async () => {
+  test('form에서 모든 값이 있을 경우 회원가입을 실행하고 response를 500으로 받았을 경우', async () => {
     saveProfile.mockImplementation(() => {
       return new Promise((_, reject) => {
         reject({
@@ -147,7 +147,7 @@ describe('회원가입 testing', () => {
     await wrapper.find('#name').setValue('홍길동');
     await wrapper.find('#password').setValue('chleorjs12@');
     await wrapper.find('#email').setValue('chleorjs37@gmail.com');
-    await wrapper.find('#tel').setValue('010-2908-3509');
+    await wrapper.find('#tel').setValue('01029083509');
     await wrapper.find('#gender[value=men]').setValue();
 
     await wrapper.find('form').trigger('submit.prevent');
