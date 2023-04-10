@@ -67,16 +67,12 @@ export default {
 
       saveProfile(form)
         .then(value => {
-          const { status } = value;
-          if (status === 201) {
-            alert('회원가입되셨습니다.');
-            router.push('/login');
-          } else {
-            alert('회원가입에 실패하였습니다.');
-          }
+          alert('회원가입되셨습니다.');
+          router.push('/login');
         })
         .catch(err => {
-          alert(`서버에 문제가 발생하였습니다.\n${JSON.stringify(err)}`);
+          const { message } = err;
+          alert(message);
         });
     };
 

@@ -112,7 +112,7 @@ describe('회원가입 testing', () => {
     alert.mockClear();
   });
 
-  test('form에서 모든 값이 있을 경우 회원가입을 실행한다.', async () => {
+  test('form에서 모든 값이 있을 경우 회원가입을 실행하고 response를 201로 받았을 경우', async () => {
     saveProfile.mockImplementation(() => {
       return new Promise(resolove => {
         resolove({
@@ -133,5 +133,26 @@ describe('회원가입 testing', () => {
     alert.mockClear();
     // router.push를 호출하였는지 확인
     expect(push).toHaveBeenCalledWith('/login');
+  });
+
+  test('form에서 모든 값이 있을 경우 회원가입을 실행하고 response를 404으로 받았을 경우', async () => {
+    saveProfile.mockImplementation(() => {
+      return new Promise((_, reject) => {
+        reject({
+          status: 500,
+          message: '서버에 문제가 발생하였습니다.',
+        });
+      });
+    });
+    await wrapper.find('#name').setValue('홍길동');
+    await wrapper.find('#password').setValue('chleorjs12@');
+    await wrapper.find('#email').setValue('chleorjs37@gmail.com');
+    await wrapper.find('#tel').setValue('010-2908-3509');
+    await wrapper.find('#gender[value=men]').setValue();
+
+    await wrapper.find('form').trigger('submit.prevent');
+    await expect(saveProfile).toHaveBeenCalled();
+    expect(alert).toBeCalledWith('서버에 문제가 발생하였습니다.');
+    alert.mockClear();
   });
 });
