@@ -55,6 +55,11 @@ export default {
         return false;
       }
 
+      if (!required(form.tel)) {
+        alert('전화번호는 필수 값입니다.');
+        return false;
+      }
+
       if (!required(form.gender)) {
         alert('성별은 필수 값입니다.');
         return false;
@@ -66,7 +71,7 @@ export default {
       }
 
       saveProfile(form)
-        .then(value => {
+        .then(() => {
           alert('회원가입되셨습니다.');
           router.push('/login');
         })
